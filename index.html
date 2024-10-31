@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Agent Details</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th,
+    td {
+      padding: 10px;
+      text-align: left;
+      border: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>User Agent Information</h1>
+  <table>
+    <tr>
+      <th>Property</th>
+      <th>Value</th>
+    </tr>
+    <tr>
+      <td>User Agent</td>
+      <td id="user-agent"></td>
+    </tr>
+    <tr>
+      <td>Browser</td>
+      <td id="browser"></td>
+    </tr>
+    <tr>
+      <td>Browser Version</td>
+      <td id="browser-version"></td>
+    </tr>
+    <tr>
+      <td>Operating System</td>
+      <td id="os"></td>
+    </tr>
+    <tr>
+      <td>Device Type</td>
+      <td id="device"></td>
+    </tr>
+    <tr>
+      <td>Mobile</td>
+      <td id="is-mobile"></td>
+    </tr>
+    <tr>
+      <td>Browser Details</td>
+      <td id="browser-details"></td>
+    </tr>
+  </table>
+
+  <script>
+    // Get the user agent string
+    const userAgent = navigator.userAgent;
+
+    // Function to extract browser information
+    const getBrowserInfo = (userAgent) => {
+      const browsers = {
+        Chrome: /Chrome\/(\d+)\.(\d+)/,
+        Firefox: /Firefox\/(\d+)\.(\d+)/,
+        Safari: /Version\/(\d+)\.(\d+).*Safari/,
+        IE: /MSIE (\d+)\.(\d+)|rv:(\d+)/
+      };
+
+      for (const [name, regex] of Object.entries(browsers)) {
+        const match = userAgent.match(regex);
+        if (match) {
+          const majorVersion = match[1] || match[3];
+          const minorVersion = match[2] || "0";
+          return {
+            browserName: name,
+            majorVersion,
+            minorVersion,
+            fullVersion: `${majorVersion}.${minorVersion}`
+          };
+        }
+      }
+
+      return { browserName: "Unknown", majorVersion: "Unknown", minorVersion: "Unknown", fullVersion: "Unknown" };
+    };
+
+    // Function to detect OS and device type
+    const getOSAndDevice = (userAgent) => {
+      const osPatterns = {
+        Windows: /Win/,
+        Mac: /Mac/,
+        Linux: /Linux|X11/,
+        Android: /Android/,
+        iOS: /iPhone|iPad/
+      };
+
+      const isMobile = /Mobile|Android|iPad/.test(userAgent);
+      const deviceType = isMobile ? "Mobile" : "Desktop";
+
+      const os = Object.entries(osPatterns).find(([name, pattern]) => pattern.test(userAgent))?.[0] || "Unknown OS";
+
+      return { os, deviceType, isMobile };
+    };
+
+    // Get browser and OS information
+    const { browserName, majorVersion, minorVersion, fullVersion } = getBrowserInfo(userAgent);
+    const { os, deviceType, isMobile } = getOSAndDevice(userAgent);
+
+    // Display information in the table
+    document.getElementById('user-agent').textContent = userAgent;
+    document.getElementById('browser').textContent = browserName;
+    document.getElementById('browser-version').textContent = fullVersion;
+    document.getElementById('os').textContent = os;
+    document.getElementById('device').textContent = deviceType;
+    document.getElementById('is-mobile').textContent = isMobile ? "Yes" : "No";
+    document.getElementById('browser-details').textContent = `${browserName} v${fullVersion} on ${os}`;
+  </script>
+
+</body>
+
+</html>
